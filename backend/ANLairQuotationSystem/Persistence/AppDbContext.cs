@@ -1,8 +1,7 @@
 ﻿using ANLairQuotationSystem.Entities;
-using ANLAIRQuotationSystem.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace ANLAIRQuotationSystem.Persistence;
+namespace ANLairQuotationSystem.Persistence;
 
 public class AppDbContext(DbContextOptions options) : DbContext(options)
 {
@@ -369,11 +368,16 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
                 .IsRequired();
 
             entity.Property(e => e.Middlename)
+                .IsRequired(false)
                 .HasMaxLength(100);
 
             entity.Property(e => e.Surname)
                 .HasMaxLength(100)
                 .IsRequired();
+
+            entity.Property(e => e.ExtensionName)
+                .IsRequired(false)
+                .HasMaxLength(20);
 
             entity.Property(e => e.ContactNumber)
                 .HasMaxLength(20);
