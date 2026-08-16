@@ -1,4 +1,4 @@
-﻿namespace ANLAIRQuotationSystem.Entities;
+﻿namespace ANLairQuotationSystem.Entities;
 
 public class RolePermission
 {

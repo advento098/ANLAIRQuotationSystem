@@ -1,6 +1,4 @@
-﻿using ANLairQuotationSystem.Entities;
-
-namespace ANLAIRQuotationSystem.Entities;
+﻿namespace ANLairQuotationSystem.Entities;
 
 public class Project
 {

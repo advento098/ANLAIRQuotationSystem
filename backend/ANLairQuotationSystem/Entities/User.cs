@@ -1,6 +1,4 @@
-﻿using ANLairQuotationSystem.Entities;
-
-namespace ANLAIRQuotationSystem.Entities;
+﻿namespace ANLairQuotationSystem.Entities;
 
 public class User
 {
@@ -10,6 +8,7 @@ public class User
     public required string Firstname { get; set; }
     public string? Middlename { get; set; }
     public required string Surname { get; set; }
+    public string? ExtensionName { get; set; }
     public string? ContactNumber { get; set; }
     public required string Email { get; set; }
     public UserStatus Status { get; set; }
