@@ -5,7 +5,6 @@ namespace ANLairQuotationSystem.Persistence;
 
 public class AppDbContext(DbContextOptions options) : DbContext(options)
 {
-    // TODO: Continue checking the correctness of the entities
     public DbSet<Client> Clients { get; set; }
     public DbSet<ComputationConstant> ComputationConstants { get; set; }
     public DbSet<Permission> Permissions { get; set; }
@@ -333,6 +332,15 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             //    .HasForeignKey(e => e.RoleId)
             //    .OnDelete(DeleteBehavior.Cascade);
         });  // DONE
+        builder.Entity<Role>().HasData(
+                [
+                    new Role() { Id = 1, Name = "Employee", IsActive = true, DateCreated = new DateTime(2026, 8, 16, 10, 25, 0) },
+                    new Role() { Id = 2, Name = "Sales Support", IsActive = true, DateCreated = new DateTime(2026, 8, 16, 10, 25, 0) },
+                    new Role() { Id = 3, Name = "Project Officer", IsActive = true, DateCreated = new DateTime(2026, 8, 16, 10, 25, 0) },
+                    new Role() { Id = 4, Name = "Senior Manager", IsActive = true, DateCreated = new DateTime(2026, 8, 16, 10, 25, 0) },
+                    new Role() { Id = 5, Name = "Admin", IsActive = true, DateCreated = new DateTime(2026, 8, 16, 10, 25, 0) }
+                ]
+            );
 
         builder.Entity<RolePermission>(entity =>
         {
@@ -362,6 +370,17 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
 
             entity.HasIndex(e => e.PublicId)
                 .IsUnique();
+
+            entity.Property(e => e.Username)
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.HasIndex(e => e.Username)
+               .IsUnique();
+
+            entity.Property(e => e.Password)
+                .HasMaxLength(200)
+                .IsRequired();
 
             entity.Property(e => e.Firstname)
                 .HasMaxLength(100)

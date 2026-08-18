@@ -4,6 +4,7 @@ using ANLairQuotationSystem.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ANLairQuotationSystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260816022725_AddedDefaultRoleData")]
+    partial class AddedDefaultRoleData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1018,12 +1021,6 @@ namespace ANLairQuotationSystem.Migrations
                         .HasColumnType("varchar(100)")
                         .HasColumnName("middlename");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("password");
-
                     b.Property<string>("PublicId")
                         .IsRequired()
                         .HasMaxLength(15)
@@ -1044,12 +1041,6 @@ namespace ANLairQuotationSystem.Migrations
                         .HasColumnType("varchar(100)")
                         .HasColumnName("surname");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("username");
-
                     b.HasKey("Id")
                         .HasName("pk_users");
 
@@ -1063,10 +1054,6 @@ namespace ANLairQuotationSystem.Migrations
 
                     b.HasIndex("RoleId")
                         .HasDatabaseName("ix_users_role_id");
-
-                    b.HasIndex("Username")
-                        .IsUnique()
-                        .HasDatabaseName("ix_users_username");
 
                     b.ToTable("users", (string)null);
                 });
@@ -1091,10 +1078,6 @@ namespace ANLairQuotationSystem.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("date_expiring")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_active");
 
                     b.Property<string>("RefreshToken")
                         .IsRequired()

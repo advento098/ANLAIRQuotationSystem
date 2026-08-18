@@ -4,6 +4,7 @@ using ANLairQuotationSystem.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ANLairQuotationSystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260816013501_UserExtensionName")]
+    partial class UserExtensionName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace ANLairQuotationSystem.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.Client", b =>
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.Client", b =>
                 {
                     b.Property<uint>("Id")
                         .ValueGeneratedOnAdd()
@@ -105,7 +108,7 @@ namespace ANLairQuotationSystem.Migrations
                     b.ToTable("clients", (string)null);
                 });
 
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.ComputationConstant", b =>
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.ComputationConstant", b =>
                 {
                     b.Property<uint>("Id")
                         .ValueGeneratedOnAdd()
@@ -150,6 +153,403 @@ namespace ANLairQuotationSystem.Migrations
                         .HasDatabaseName("ix_computation_constants_name");
 
                     b.ToTable("computation_constants", (string)null);
+                });
+
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.Permission", b =>
+                {
+                    b.Property<uint>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<uint>("Id"));
+
+                    b.Property<DateTime>("DateCreated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("date_created")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+                    b.Property<DateTime>("DateModified")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("date_modified")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_permissions");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_permissions_name");
+
+                    b.ToTable("permissions", (string)null);
+                });
+
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.Project", b =>
+                {
+                    b.Property<uint>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<uint>("Id"));
+
+                    b.Property<uint>("ClientId")
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("client_id");
+
+                    b.Property<uint>("CreatorId")
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("creator_id");
+
+                    b.Property<DateTime>("DateCreated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("date_created")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+                    b.Property<DateTime>("DateModified")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("date_modified")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+                    b.Property<DateTime>("DateRequested")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("date_requested");
+
+                    b.Property<string>("HospitalName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("hospital_name");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("RequestorExtensionName")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("requestor_extension_name");
+
+                    b.Property<string>("RequestorFirstname")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("requestor_firstname");
+
+                    b.Property<string>("RequestorMiddlename")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("requestor_middlename");
+
+                    b.Property<string>("RequestorPosition")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("requestor_position");
+
+                    b.Property<string>("RequestorSurname")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("requestor_surname");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int")
+                        .HasColumnName("status");
+
+                    b.Property<string>("UniqueId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("unique_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_projects");
+
+                    b.HasIndex("ClientId")
+                        .HasDatabaseName("ix_projects_client_id");
+
+                    b.HasIndex("CreatorId")
+                        .HasDatabaseName("ix_projects_creator_id");
+
+                    b.HasIndex("UniqueId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_projects_unique_id");
+
+                    b.ToTable("projects", (string)null);
+                });
+
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.Quotation", b =>
+                {
+                    b.Property<uint>("ProjectId")
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("project_id");
+
+                    b.Property<decimal>("FinalCost")
+                        .HasPrecision(14, 2)
+                        .HasColumnType("decimal(14,2)")
+                        .HasColumnName("final_cost");
+
+                    b.Property<decimal>("ItemsFinalCost")
+                        .HasPrecision(13, 2)
+                        .HasColumnType("decimal(13,2)")
+                        .HasColumnName("items_final_cost");
+
+                    b.HasKey("ProjectId")
+                        .HasName("pk_quotations");
+
+                    b.ToTable("quotations", (string)null);
+                });
+
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.QuotationAdditional", b =>
+                {
+                    b.Property<uint>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<uint>("Id"));
+
+                    b.Property<decimal>("Cost")
+                        .HasPrecision(13, 2)
+                        .HasColumnType("decimal(13,2)")
+                        .HasColumnName("cost");
+
+                    b.Property<DateTime>("DateCreated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("date_created")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+                    b.Property<DateTime>("DateModified")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("date_modified")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)")
+                        .HasColumnName("name");
+
+                    b.Property<uint>("QuotationId")
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("quotation_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_quotation_additionals");
+
+                    b.HasIndex("QuotationId")
+                        .HasDatabaseName("ix_quotation_additionals_quotation_id");
+
+                    b.ToTable("quotation_additionals", (string)null);
+                });
+
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.Role", b =>
+                {
+                    b.Property<uint>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<uint>("Id"));
+
+                    b.Property<DateTime>("DateCreated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("date_created")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+                    b.Property<DateTime>("DateModified")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("date_modified")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_roles");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_roles_name");
+
+                    b.ToTable("roles", (string)null);
+                });
+
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.RolePermission", b =>
+                {
+                    b.Property<uint>("RoleId")
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("role_id");
+
+                    b.Property<uint>("PermissionId")
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("permission_id");
+
+                    b.HasKey("RoleId", "PermissionId")
+                        .HasName("pk_role_permissions");
+
+                    b.HasIndex("PermissionId")
+                        .HasDatabaseName("ix_role_permissions_permission_id");
+
+                    b.ToTable("role_permissions", (string)null);
+                });
+
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.User", b =>
+                {
+                    b.Property<uint>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<uint>("Id"));
+
+                    b.Property<string>("ContactNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("contact_number");
+
+                    b.Property<DateTime>("DateCreated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("date_created")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+                    b.Property<DateTime>("DateModified")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("date_modified")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("email");
+
+                    b.Property<string>("ExtensionName")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("extension_name");
+
+                    b.Property<string>("Firstname")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("firstname");
+
+                    b.Property<string>("Middlename")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("middlename");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("varchar(15)")
+                        .HasColumnName("public_id");
+
+                    b.Property<uint>("RoleId")
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("role_id");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int")
+                        .HasColumnName("status");
+
+                    b.Property<string>("Surname")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("surname");
+
+                    b.HasKey("Id")
+                        .HasName("pk_users");
+
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_email");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_public_id");
+
+                    b.HasIndex("RoleId")
+                        .HasDatabaseName("ix_users_role_id");
+
+                    b.ToTable("users", (string)null);
+                });
+
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.UserSession", b =>
+                {
+                    b.Property<uint>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<uint>("Id"));
+
+                    b.Property<DateTime>("DateCreated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("date_created")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+                    b.Property<DateTime>("DateExpiring")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("date_expiring")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)")
+                        .HasColumnName("refresh_token");
+
+                    b.Property<uint>("UserId")
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_user_sessions");
+
+                    b.HasIndex("RefreshToken")
+                        .IsUnique()
+                        .HasDatabaseName("ix_user_sessions_refresh_token");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_user_sessions_user_id");
+
+                    b.ToTable("user_sessions", (string)null);
                 });
 
             modelBuilder.Entity("ANLairQuotationSystem.Entities.Item", b =>
@@ -395,141 +795,6 @@ namespace ANLairQuotationSystem.Migrations
                         .HasName("pk_item_types");
 
                     b.ToTable("item_types", (string)null);
-                });
-
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.Permission", b =>
-                {
-                    b.Property<uint>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int unsigned")
-                        .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<uint>("Id"));
-
-                    b.Property<DateTime>("DateCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("date_created")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-
-                    b.Property<DateTime>("DateModified")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("date_modified")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("name");
-
-                    b.HasKey("Id")
-                        .HasName("pk_permissions");
-
-                    b.HasIndex("Name")
-                        .IsUnique()
-                        .HasDatabaseName("ix_permissions_name");
-
-                    b.ToTable("permissions", (string)null);
-                });
-
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.Project", b =>
-                {
-                    b.Property<uint>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int unsigned")
-                        .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<uint>("Id"));
-
-                    b.Property<uint>("ClientId")
-                        .HasColumnType("int unsigned")
-                        .HasColumnName("client_id");
-
-                    b.Property<uint>("CreatorId")
-                        .HasColumnType("int unsigned")
-                        .HasColumnName("creator_id");
-
-                    b.Property<DateTime>("DateCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("date_created")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-
-                    b.Property<DateTime>("DateModified")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("date_modified")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-
-                    b.Property<DateTime>("DateRequested")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("date_requested");
-
-                    b.Property<string>("HospitalName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("hospital_name");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("name");
-
-                    b.Property<string>("RequestorExtensionName")
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("requestor_extension_name");
-
-                    b.Property<string>("RequestorFirstname")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("requestor_firstname");
-
-                    b.Property<string>("RequestorMiddlename")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("requestor_middlename");
-
-                    b.Property<string>("RequestorPosition")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("requestor_position");
-
-                    b.Property<string>("RequestorSurname")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("requestor_surname");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int")
-                        .HasColumnName("status");
-
-                    b.Property<string>("UniqueId")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("unique_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_projects");
-
-                    b.HasIndex("ClientId")
-                        .HasDatabaseName("ix_projects_client_id");
-
-                    b.HasIndex("CreatorId")
-                        .HasDatabaseName("ix_projects_creator_id");
-
-                    b.HasIndex("UniqueId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_projects_unique_id");
-
-                    b.ToTable("projects", (string)null);
                 });
 
             modelBuilder.Entity("ANLairQuotationSystem.Entities.ProjectItem", b =>
@@ -791,337 +1056,9 @@ namespace ANLairQuotationSystem.Migrations
                     b.ToTable("project_request_proofs", (string)null);
                 });
 
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.Quotation", b =>
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.Client", b =>
                 {
-                    b.Property<uint>("ProjectId")
-                        .HasColumnType("int unsigned")
-                        .HasColumnName("project_id");
-
-                    b.Property<decimal>("FinalCost")
-                        .HasPrecision(14, 2)
-                        .HasColumnType("decimal(14,2)")
-                        .HasColumnName("final_cost");
-
-                    b.Property<decimal>("ItemsFinalCost")
-                        .HasPrecision(13, 2)
-                        .HasColumnType("decimal(13,2)")
-                        .HasColumnName("items_final_cost");
-
-                    b.HasKey("ProjectId")
-                        .HasName("pk_quotations");
-
-                    b.ToTable("quotations", (string)null);
-                });
-
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.QuotationAdditional", b =>
-                {
-                    b.Property<uint>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int unsigned")
-                        .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<uint>("Id"));
-
-                    b.Property<decimal>("Cost")
-                        .HasPrecision(13, 2)
-                        .HasColumnType("decimal(13,2)")
-                        .HasColumnName("cost");
-
-                    b.Property<DateTime>("DateCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("date_created")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-
-                    b.Property<DateTime>("DateModified")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("date_modified")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("description");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("varchar(150)")
-                        .HasColumnName("name");
-
-                    b.Property<uint>("QuotationId")
-                        .HasColumnType("int unsigned")
-                        .HasColumnName("quotation_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_quotation_additionals");
-
-                    b.HasIndex("QuotationId")
-                        .HasDatabaseName("ix_quotation_additionals_quotation_id");
-
-                    b.ToTable("quotation_additionals", (string)null);
-                });
-
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.Role", b =>
-                {
-                    b.Property<uint>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int unsigned")
-                        .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<uint>("Id"));
-
-                    b.Property<DateTime>("DateCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("date_created")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-
-                    b.Property<DateTime>("DateModified")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("date_modified")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("description");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_active");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("name");
-
-                    b.HasKey("Id")
-                        .HasName("pk_roles");
-
-                    b.HasIndex("Name")
-                        .IsUnique()
-                        .HasDatabaseName("ix_roles_name");
-
-                    b.ToTable("roles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1u,
-                            DateCreated = new DateTime(2026, 8, 16, 10, 25, 0, 0, DateTimeKind.Unspecified),
-                            DateModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsActive = true,
-                            Name = "Employee"
-                        },
-                        new
-                        {
-                            Id = 2u,
-                            DateCreated = new DateTime(2026, 8, 16, 10, 25, 0, 0, DateTimeKind.Unspecified),
-                            DateModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsActive = true,
-                            Name = "Sales Support"
-                        },
-                        new
-                        {
-                            Id = 3u,
-                            DateCreated = new DateTime(2026, 8, 16, 10, 25, 0, 0, DateTimeKind.Unspecified),
-                            DateModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsActive = true,
-                            Name = "Project Officer"
-                        },
-                        new
-                        {
-                            Id = 4u,
-                            DateCreated = new DateTime(2026, 8, 16, 10, 25, 0, 0, DateTimeKind.Unspecified),
-                            DateModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsActive = true,
-                            Name = "Senior Manager"
-                        },
-                        new
-                        {
-                            Id = 5u,
-                            DateCreated = new DateTime(2026, 8, 16, 10, 25, 0, 0, DateTimeKind.Unspecified),
-                            DateModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsActive = true,
-                            Name = "Admin"
-                        });
-                });
-
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.RolePermission", b =>
-                {
-                    b.Property<uint>("RoleId")
-                        .HasColumnType("int unsigned")
-                        .HasColumnName("role_id");
-
-                    b.Property<uint>("PermissionId")
-                        .HasColumnType("int unsigned")
-                        .HasColumnName("permission_id");
-
-                    b.HasKey("RoleId", "PermissionId")
-                        .HasName("pk_role_permissions");
-
-                    b.HasIndex("PermissionId")
-                        .HasDatabaseName("ix_role_permissions_permission_id");
-
-                    b.ToTable("role_permissions", (string)null);
-                });
-
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.User", b =>
-                {
-                    b.Property<uint>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int unsigned")
-                        .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<uint>("Id"));
-
-                    b.Property<string>("ContactNumber")
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("contact_number");
-
-                    b.Property<DateTime>("DateCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("date_created")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-
-                    b.Property<DateTime>("DateModified")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("date_modified")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("email");
-
-                    b.Property<string>("ExtensionName")
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("extension_name");
-
-                    b.Property<string>("Firstname")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("firstname");
-
-                    b.Property<string>("Middlename")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("middlename");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("password");
-
-                    b.Property<string>("PublicId")
-                        .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("varchar(15)")
-                        .HasColumnName("public_id");
-
-                    b.Property<uint>("RoleId")
-                        .HasColumnType("int unsigned")
-                        .HasColumnName("role_id");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int")
-                        .HasColumnName("status");
-
-                    b.Property<string>("Surname")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("surname");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("username");
-
-                    b.HasKey("Id")
-                        .HasName("pk_users");
-
-                    b.HasIndex("Email")
-                        .IsUnique()
-                        .HasDatabaseName("ix_users_email");
-
-                    b.HasIndex("PublicId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_users_public_id");
-
-                    b.HasIndex("RoleId")
-                        .HasDatabaseName("ix_users_role_id");
-
-                    b.HasIndex("Username")
-                        .IsUnique()
-                        .HasDatabaseName("ix_users_username");
-
-                    b.ToTable("users", (string)null);
-                });
-
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.UserSession", b =>
-                {
-                    b.Property<uint>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int unsigned")
-                        .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<uint>("Id"));
-
-                    b.Property<DateTime>("DateCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("date_created")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-
-                    b.Property<DateTime>("DateExpiring")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("date_expiring")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_active");
-
-                    b.Property<string>("RefreshToken")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("varchar(150)")
-                        .HasColumnName("refresh_token");
-
-                    b.Property<uint>("UserId")
-                        .HasColumnType("int unsigned")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_user_sessions");
-
-                    b.HasIndex("RefreshToken")
-                        .IsUnique()
-                        .HasDatabaseName("ix_user_sessions_refresh_token");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_user_sessions_user_id");
-
-                    b.ToTable("user_sessions", (string)null);
-                });
-
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.Client", b =>
-                {
-                    b.HasOne("ANLairQuotationSystem.Entities.User", "CreatorUser")
+                    b.HasOne("ANLAIRQuotationSystem.Entities.User", "CreatorUser")
                         .WithMany("CreatedClients")
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1129,6 +1066,96 @@ namespace ANLairQuotationSystem.Migrations
                         .HasConstraintName("fk_clients_users_creator_id");
 
                     b.Navigation("CreatorUser");
+                });
+
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.Project", b =>
+                {
+                    b.HasOne("ANLAIRQuotationSystem.Entities.Client", "Client")
+                        .WithMany("ClientProjects")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_projects_clients_client_id");
+
+                    b.HasOne("ANLAIRQuotationSystem.Entities.User", "Creator")
+                        .WithMany("CreatedProjects")
+                        .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_projects_users_creator_id");
+
+                    b.Navigation("Client");
+
+                    b.Navigation("Creator");
+                });
+
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.Quotation", b =>
+                {
+                    b.HasOne("ANLAIRQuotationSystem.Entities.Project", "Project")
+                        .WithOne("Quotation")
+                        .HasForeignKey("ANLAIRQuotationSystem.Entities.Quotation", "ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_quotations_projects_project_id");
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.QuotationAdditional", b =>
+                {
+                    b.HasOne("ANLAIRQuotationSystem.Entities.Quotation", "Quotation")
+                        .WithMany("QuotationAdditionals")
+                        .HasForeignKey("QuotationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_quotation_additionals_quotations_quotation_id");
+
+                    b.Navigation("Quotation");
+                });
+
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.RolePermission", b =>
+                {
+                    b.HasOne("ANLAIRQuotationSystem.Entities.Permission", "Permission")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_role_permissions_permissions_permission_id");
+
+                    b.HasOne("ANLAIRQuotationSystem.Entities.Role", "Role")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_role_permissions_roles_role_id");
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.User", b =>
+                {
+                    b.HasOne("ANLAIRQuotationSystem.Entities.Role", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_users_roles_role_id");
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.UserSession", b =>
+                {
+                    b.HasOne("ANLAIRQuotationSystem.Entities.User", "User")
+                        .WithMany("UserSessions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_user_sessions_users_user_id");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ANLairQuotationSystem.Entities.Item", b =>
@@ -1179,30 +1206,9 @@ namespace ANLairQuotationSystem.Migrations
                     b.Navigation("Item");
                 });
 
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.Project", b =>
-                {
-                    b.HasOne("ANLairQuotationSystem.Entities.Client", "Client")
-                        .WithMany("ClientProjects")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_projects_clients_client_id");
-
-                    b.HasOne("ANLairQuotationSystem.Entities.User", "Creator")
-                        .WithMany("CreatedProjects")
-                        .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_projects_users_creator_id");
-
-                    b.Navigation("Client");
-
-                    b.Navigation("Creator");
-                });
-
             modelBuilder.Entity("ANLairQuotationSystem.Entities.ProjectItem", b =>
                 {
-                    b.HasOne("ANLairQuotationSystem.Entities.Project", "Project")
+                    b.HasOne("ANLAIRQuotationSystem.Entities.Project", "Project")
                         .WithMany("ProjectItems")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1259,14 +1265,14 @@ namespace ANLairQuotationSystem.Migrations
 
             modelBuilder.Entity("ANLairQuotationSystem.Entities.ProjectRequestProof", b =>
                 {
-                    b.HasOne("ANLairQuotationSystem.Entities.User", "Creator")
+                    b.HasOne("ANLAIRQuotationSystem.Entities.User", "Creator")
                         .WithMany("CreatedProjectRequestProofs")
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_project_request_proofs_users_creator_id");
 
-                    b.HasOne("ANLairQuotationSystem.Entities.Project", "Project")
+                    b.HasOne("ANLAIRQuotationSystem.Entities.Project", "Project")
                         .WithMany("ProjectRequestProofs")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1278,78 +1284,47 @@ namespace ANLairQuotationSystem.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.Quotation", b =>
-                {
-                    b.HasOne("ANLairQuotationSystem.Entities.Project", "Project")
-                        .WithOne("Quotation")
-                        .HasForeignKey("ANLairQuotationSystem.Entities.Quotation", "ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_quotations_projects_project_id");
-
-                    b.Navigation("Project");
-                });
-
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.QuotationAdditional", b =>
-                {
-                    b.HasOne("ANLairQuotationSystem.Entities.Quotation", "Quotation")
-                        .WithMany("QuotationAdditionals")
-                        .HasForeignKey("QuotationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_quotation_additionals_quotations_quotation_id");
-
-                    b.Navigation("Quotation");
-                });
-
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.RolePermission", b =>
-                {
-                    b.HasOne("ANLairQuotationSystem.Entities.Permission", "Permission")
-                        .WithMany("RolePermissions")
-                        .HasForeignKey("PermissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_role_permissions_permissions_permission_id");
-
-                    b.HasOne("ANLairQuotationSystem.Entities.Role", "Role")
-                        .WithMany("RolePermissions")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_role_permissions_roles_role_id");
-
-                    b.Navigation("Permission");
-
-                    b.Navigation("Role");
-                });
-
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.User", b =>
-                {
-                    b.HasOne("ANLairQuotationSystem.Entities.Role", "Role")
-                        .WithMany("Users")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_users_roles_role_id");
-
-                    b.Navigation("Role");
-                });
-
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.UserSession", b =>
-                {
-                    b.HasOne("ANLairQuotationSystem.Entities.User", "User")
-                        .WithMany("UserSessions")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_sessions_users_user_id");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.Client", b =>
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.Client", b =>
                 {
                     b.Navigation("ClientProjects");
+                });
+
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.Permission", b =>
+                {
+                    b.Navigation("RolePermissions");
+                });
+
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.Project", b =>
+                {
+                    b.Navigation("ProjectItems");
+
+                    b.Navigation("ProjectRequestProofs");
+
+                    b.Navigation("Quotation")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.Quotation", b =>
+                {
+                    b.Navigation("QuotationAdditionals");
+                });
+
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.Role", b =>
+                {
+                    b.Navigation("RolePermissions");
+
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("ANLAIRQuotationSystem.Entities.User", b =>
+                {
+                    b.Navigation("CreatedClients");
+
+                    b.Navigation("CreatedProjectRequestProofs");
+
+                    b.Navigation("CreatedProjects");
+
+                    b.Navigation("UserSessions");
                 });
 
             modelBuilder.Entity("ANLairQuotationSystem.Entities.Item", b =>
@@ -1368,21 +1343,6 @@ namespace ANLairQuotationSystem.Migrations
                     b.Navigation("ProjectItems");
                 });
 
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.Permission", b =>
-                {
-                    b.Navigation("RolePermissions");
-                });
-
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.Project", b =>
-                {
-                    b.Navigation("ProjectItems");
-
-                    b.Navigation("ProjectRequestProofs");
-
-                    b.Navigation("Quotation")
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("ANLairQuotationSystem.Entities.ProjectItem", b =>
                 {
                     b.Navigation("ProjectItemExpenses");
@@ -1390,29 +1350,6 @@ namespace ANLairQuotationSystem.Migrations
                     b.Navigation("ProjectItemImages");
 
                     b.Navigation("ProjectItemSpecifications");
-                });
-
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.Quotation", b =>
-                {
-                    b.Navigation("QuotationAdditionals");
-                });
-
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.Role", b =>
-                {
-                    b.Navigation("RolePermissions");
-
-                    b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.User", b =>
-                {
-                    b.Navigation("CreatedClients");
-
-                    b.Navigation("CreatedProjectRequestProofs");
-
-                    b.Navigation("CreatedProjects");
-
-                    b.Navigation("UserSessions");
                 });
 #pragma warning restore 612, 618
         }
