@@ -1,5 +1,6 @@
 ﻿using ANLairQuotationSystem.Common;
 using ANLairQuotationSystem.Services;
+using ANLairQuotationSystem.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,10 +9,20 @@ namespace ANLairQuotationSystem.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class AuthController(
+        IConfiguration config,
+        TokenOptions tokenOptions,
         AuthenticationService authService
     ) : ControllerBase
 {
+    private readonly IConfiguration _config = config;
+    private readonly TokenOptions _tokenOptions = tokenOptions;
     private readonly AuthenticationService _authService = authService;
+
+    [HttpGet("test")]
+    public async Task<IActionResult> Test()
+    {
+        return Unauthorized();
+    }
 
     [HttpPost("register")]
     public async Task<IActionResult> RegisterUser([FromBody] RegistrationPayload payload)
@@ -46,7 +57,9 @@ public class AuthController(
             var loginResult = await _authService.LoginUser(payload.UserIdentifier, payload.Password);
             if (!loginResult.IsSuccess) throw new Exception(loginResult.Message);
 
-            return Ok(loginResult);
+            Response.Cookies.Append("refreshToken", loginResult.Value!.RefreshToken, _tokenOptions.RefreshTokenOptions);
+
+            return Ok(Result<string>.Ok(loginResult.Value!.AccessToken, loginResult.Message));
         }
         catch (Exception ex)
         {
@@ -56,14 +69,44 @@ public class AuthController(
 
     [HttpPost("logout")]
     [Authorize]
-    public async Task<IActionResult> LogoutUser([FromBody] LogoutPayload payload)
+    public async Task<IActionResult> LogoutUser()
     {
         try
         {
-            var logoutResult = await _authService.LogoutUser(payload.Token);
+            if (!Request.Cookies.TryGetValue(_tokenOptions.RefreshCookieName, out var refreshTokenCookie))
+                return Unauthorized(new ErrorResponse("Invalid request"));
+
+            var logoutResult = await _authService.LogoutUser(refreshTokenCookie);
             if (!logoutResult.IsSuccess) return Unauthorized(new ErrorResponse(logoutResult.Message));
 
+            // Overwrite the cookie with an empty value and the expired date
+            Response.Cookies.Append(_tokenOptions.RefreshCookieName, "", _tokenOptions.ExpiredRefreshTokenOptions);
+
             return Ok(logoutResult);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new ErrorResponse(ex.Message));
+        }
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> RefreshUser()
+    {
+        try
+        {
+            if (!Request.Cookies.TryGetValue(_tokenOptions.RefreshCookieName, out var refreshTokenCookie))
+            {
+                return Unauthorized(new ErrorResponse("Invalid request"));
+            }
+
+            // TODO: Pass this to a new service for refreshing tokens
+            var result = await _authService.RefreshToken(refreshTokenCookie);
+            if (!result.IsSuccess) return Unauthorized(new ErrorResponse(result.Message));
+
+            Response.Cookies.Append(_tokenOptions.RefreshCookieName, result.Value!.RefreshToken, _tokenOptions.RefreshTokenOptions);
+
+            return Ok(Result<string>.Ok(result.Value!.AccessToken, result.Message));
         }
         catch (Exception ex)
         {
@@ -75,11 +118,11 @@ public class AuthController(
             string Username,
             string Password,
             string Firstname,
+            string Middlename,
             string Surname,
             string ContactNumber,
             string Email,
-            string Middlename,
-            string ExtensionName
+            string? ExtensionName
         );
     public record LoginPayload(string UserIdentifier, string Password);
     public record LogoutPayload(string Token);
