@@ -480,3 +480,5 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+frontend/ANLairQuotationSystem/.env.development
+frontend/ANLairQuotationSystem/.env.production
