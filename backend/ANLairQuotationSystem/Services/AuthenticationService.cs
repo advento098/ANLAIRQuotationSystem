@@ -11,14 +11,12 @@ namespace ANLairQuotationSystem.Services;
 public class AuthenticationService(
         IConfiguration config,
         AppDbContext db,
-        TokenGenerator tokenGenerator,
-        PasswordHasher<User> passwordHasher
+        TokenGenerator tokenGenerator
     )
 {
     private readonly IConfiguration _config = config;
     private readonly AppDbContext _db = db;
     private readonly TokenGenerator _tokenGenerator = tokenGenerator;
-    private readonly PasswordHasher<User> _passwordHasher = passwordHasher;
 
 
     public async Task<Result<bool>> RegisterUser(
@@ -53,8 +51,9 @@ public class AuthenticationService(
             DateCreated = DateTime.Now,
             DateModified = DateTime.Now
         };
+        PasswordHasher<User> passwordHasher = new();
 
-        string hashedPw = _passwordHasher.HashPassword(newUser, password);
+        string hashedPw = passwordHasher.HashPassword(newUser, password);
 
         newUser.Password = hashedPw;
 
@@ -68,10 +67,16 @@ public class AuthenticationService(
             string password
         )
     {
-        User? user = await _db.Users.FirstOrDefaultAsync(u => u.Username == userIdentifier || u.Email == userIdentifier);
+        User? user = await _db.Users
+            .Include(u => u.Role)
+            .ThenInclude(r => r.RolePermissions)
+            .ThenInclude(rp => rp.Permission)
+            .FirstOrDefaultAsync(u => u.Username == userIdentifier || u.Email == userIdentifier);
         if (user == null) return Result<AuthenticatedUserResponse>.Fail("Invalid credentials");
 
-        if (_passwordHasher.VerifyHashedPassword(user, user.Password, password) == PasswordVerificationResult.Failed)
+        PasswordHasher<User> passwordHasher = new();
+
+        if (passwordHasher.VerifyHashedPassword(user, user.Password, password) == PasswordVerificationResult.Failed)
             return Result<AuthenticatedUserResponse>.Fail("Invalid credentials");
 
         string accessToken = _tokenGenerator.GenerateAccessToken(user);
@@ -97,6 +102,49 @@ public class AuthenticationService(
 
         return Result<AuthenticatedUserResponse>.Ok(response, "Successfully logged in");
     }
+
+    public async Task<Result<AuthenticatedUserResponse>> RefreshToken(string refreshToken)
+    {
+        UserSession? session = await _db.UserSessions
+            .Include(u => u.User)
+            .Include(u => u.User.Role)
+            .ThenInclude(r => r.RolePermissions)
+            .ThenInclude(rp => rp.Permission)
+            .FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        if (session == null) return Result<AuthenticatedUserResponse>.Fail("Invalid request");
+
+        User? user = session.User;
+        if (user == null) return Result<AuthenticatedUserResponse>.Fail("Invalid request");
+
+        session.IsActive = false;
+
+        await _db.SaveChangesAsync();
+
+        string newRefreshToken = _tokenGenerator.GenerateRefreshToken();
+        string newAccessToken = _tokenGenerator.GenerateAccessToken(user);
+
+        AuthenticatedUserResponse newTokens = new()
+        {
+            AccessToken = newAccessToken,
+            RefreshToken = newRefreshToken
+        };
+
+        // Save new user session    
+        UserSession newUserSession = new()
+        {
+            UserId = user.Id,
+            RefreshToken = newRefreshToken,
+            IsActive = true,
+            DateCreated = DateTime.Now,
+            DateExpiring = DateTime.Now.AddDays(double.Parse(_config["JwtSettings:RefreshTokenExpiryInDays"]!))
+        };
+
+        await _db.UserSessions.AddAsync(newUserSession);
+        await _db.SaveChangesAsync();
+
+        return Result<AuthenticatedUserResponse>.Ok(newTokens, "Successfully refreshed user tokens");
+    }
+
     public async Task<Result<bool>> LogoutUser(string refreshToken)
     {
         UserSession? session = await _db.UserSessions.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);

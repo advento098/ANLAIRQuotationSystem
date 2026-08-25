@@ -1,6 +1,9 @@
+using ANLairQuotationSystem.Entities;
 using ANLairQuotationSystem.Persistence;
 using ANLairQuotationSystem.Services;
+using ANLairQuotationSystem.Utilities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -8,14 +11,25 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    });
+
+builder.Services.AddHttpContextAccessor();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 // Service registration
 builder.Services.AddTransient<CurrentUserService>();
 builder.Services.AddTransient<AuthenticationService>();
+
+// Utilities registration
+builder.Services.AddTransient<ANLairQuotationSystem.Utilities.TokenOptions>();
+builder.Services.AddTransient<TokenGenerator>();
+builder.Services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
 
 #region "Database Configuration"
 
@@ -83,6 +97,18 @@ builder.Services.AddAuthentication(options =>
 
 #endregion
 
+#region "CORS"
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DevPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
+    });
+});
+#endregion
 
 var app = builder.Build();
 
@@ -91,6 +117,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseCors("DevPolicy");
 
 app.UseHttpsRedirection();
 
