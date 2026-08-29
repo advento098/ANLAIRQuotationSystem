@@ -29,6 +29,7 @@ public class Project
     {
         IDLE,
         ON_GOING,
-        QUOTED
+        QUOTED,
+        ARCHIVED
     }
 }
