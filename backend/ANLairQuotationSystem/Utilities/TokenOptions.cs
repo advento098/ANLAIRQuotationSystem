@@ -12,7 +12,7 @@ public class TokenOptions(
     {
         HttpOnly = true,
         Secure = true,
-        SameSite = SameSiteMode.Lax,
+        SameSite = SameSiteMode.None, // Change on production, should be strict
         Expires = DateTime.Now.AddDays(double.Parse(_configuration["JwtSettings:RefreshTokenExpiryInDays"]!)),
         Path = "/api/auth"
     };
@@ -21,7 +21,7 @@ public class TokenOptions(
     {
         HttpOnly = true,
         Secure = true,
-        SameSite = SameSiteMode.Lax,
+        SameSite = SameSiteMode.None, // Change on production, should be strict
         Expires = DateTime.Now.AddDays(-1),
         Path = "/api/auth"
     };
