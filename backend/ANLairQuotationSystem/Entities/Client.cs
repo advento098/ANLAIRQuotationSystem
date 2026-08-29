@@ -4,6 +4,7 @@ public class Client
 {
     public uint Id { get; set; }
     public uint CreatorId { get; set; }
+    public required string PublicId { get; set; }
     public string? CompanyName { get; set; }
     public required string Firstname { get; set; }
     public string? Middlename { get; set; }

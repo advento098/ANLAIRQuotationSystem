@@ -35,6 +35,13 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             entity.Property(c => c.Id)
             .ValueGeneratedOnAdd();
 
+            entity.Property(c => c.PublicId)
+            .IsRequired()
+            .HasColumnType("char(15)");
+
+            entity.HasIndex(c => c.PublicId)
+            .IsUnique();
+
             entity
             .Property(c => c.CompanyName)
             .IsRequired(false)
