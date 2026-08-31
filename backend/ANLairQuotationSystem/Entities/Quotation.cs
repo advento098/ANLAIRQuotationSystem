@@ -8,4 +8,5 @@ public class Quotation
 
     public Project Project { get; set; } = null!;
     public ICollection<QuotationAdditional> QuotationAdditionals { get; set; } = [];
+    public ICollection<QuotationComputationConstant> QuotationComputationConstants { get; set; } = [];
 }
