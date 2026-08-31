@@ -20,4 +20,9 @@ public class ProjectItem
     public ICollection<ProjectItemExpense> ProjectItemExpenses { get; set; } = [];
     public ICollection<ProjectItemSpecification> ProjectItemSpecifications { get; set; } = [];
     public ICollection<ProjectItemImage> ProjectItemImages { get; set; } = [];
+
+    public decimal CalculateExpenses()
+    {
+        return ProjectItemExpenses.Sum(pie => pie.Cost);
+    }
 }
