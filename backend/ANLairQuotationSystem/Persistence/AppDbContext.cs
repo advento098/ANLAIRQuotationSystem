@@ -21,6 +21,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<ProjectRequestProof> ProjectRequestProofs { get; set; }
     public DbSet<Quotation> Quotations { get; set; }
     public DbSet<QuotationAdditional> QuotationAdditionals { get; set; }
+    public DbSet<QuotationComputationConstant> QuotationComputationConstants { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<RolePermission> RolePermissions { get; set; }
     public DbSet<User> Users { get; set; }
@@ -302,6 +303,23 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
                 .WithMany(e => e.QuotationAdditionals)
                 .HasForeignKey(e => e.QuotationId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<QuotationComputationConstant>(entity =>
+        {
+            entity.HasKey(qc => new { qc.QuotationId, qc.ComputationConstantId });
+
+            entity
+            .HasOne(qc => qc.Quotation)
+            .WithMany(q => q.QuotationComputationConstants)
+            .HasForeignKey(qc => qc.QuotationId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+            entity
+            .HasOne(qc => qc.ComputationConstant)
+            .WithMany(cc => cc.QuotationComputationConstants)
+            .HasForeignKey(cc => cc.ComputationConstantId)
+            .OnDelete(DeleteBehavior.Cascade);
         });
 
         builder.Entity<Role>(entity =>
