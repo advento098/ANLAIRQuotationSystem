@@ -1,6 +1,7 @@
 ﻿using ANLairQuotationSystem.Common;
 using ANLairQuotationSystem.DTO.Payloads;
 using ANLairQuotationSystem.Entities;
+using ANLairQuotationSystem.Factories;
 using ANLairQuotationSystem.Persistence;
 using ANLairQuotationSystem.Utilities;
 using Microsoft.EntityFrameworkCore;
@@ -8,10 +9,12 @@ using Microsoft.EntityFrameworkCore;
 namespace ANLairQuotationSystem.Services;
 
 public class ProjectService(
-        AppDbContext db
+        AppDbContext db,
+        ProjectItemFactory projectItemFactory
     )
 {
     private readonly AppDbContext _db = db;
+    private readonly ProjectItemFactory _projectItemFactory = projectItemFactory;
 
     public async Task<Result<string>> CreateNewProject(NewProjectPayload payload)
     {
@@ -30,44 +33,8 @@ public class ProjectService(
             .FirstAsync();
 
         List<ProjectItem> items = payload.ItemTemplateUniqueId != null ?
-            await _db.Items
-            .Where(it => payload.ItemTemplateUniqueId.Contains(it.UniqueId))
-            .Select(item => new ProjectItem()
-            {
-                Id = item.Id,
-                TypeId = item.TypeId,
-                UniqueId = item.UniqueId,
-                Name = item.Name,
-                DistributorName = item.DistributorName,
-                ContactNumber = item.ContactNumber,
-                Email = item.Email,
-                FinalCost = item.FinalCost,
-                DateCreated = DateTime.Now,
-                DateModified = DateTime.Now,
-                Type = item.Type,
-                ProjectItemExpenses = item.ItemExpenses.Select(expense => new ProjectItemExpense()
-                {
-                    Name = expense.Name,
-                    Description = expense.Description,
-                    Cost = expense.Cost,
-                    DateCreated = DateTime.Now,
-                    DateModified = DateTime.Now
-                }).ToList(),
-                ProjectItemSpecifications = item.ItemSpecifications.Select(spec => new ProjectItemSpecification()
-                {
-                    Name = spec.Name,
-                    Description = spec.Description,
-                    Value = spec.Value,
-                    DateCreated = DateTime.Now,
-                    DateModified = DateTime.Now,
-                }).ToList(),
-                ProjectItemImages = item.ItemImages.Select(img => new ProjectItemImage()
-                {
-                    Image = img.Image,
-                    DateCreated = DateTime.Now,
-                    DateModified = DateTime.Now
-                }).ToList()
-            }).ToListAsync() : [];
+            await _projectItemFactory.CreateProjectItemsFromItemTemplateUniqueIds(payload.ItemTemplateUniqueId) :
+            [];
 
         Project newProject = new()
         {
@@ -93,6 +60,24 @@ public class ProjectService(
 
         return Result<string>.Ok(newProject.UniqueId, "Successfully created new project");
     }
+    public async Task<Result<bool>> AssignProjectItems(AssignProjectItemPayload payload)
+    {
+        // Load project
+        Project? existingProject = await _db.Projects.SingleOrDefaultAsync(p => p.UniqueId == payload.ProjectUniqueId);
+        if (existingProject == null) return Result<bool>.Fail("Project does not exists");
+        if (existingProject.Status == Project.ProjectStatus.QUOTED || existingProject.Status == Project.ProjectStatus.ARCHIVED)
+            return Result<bool>.Fail("Cannot edit quoted and archived projects");
+
+        // Load chosen items
+        List<ProjectItem> projectItems = await _projectItemFactory.CreateProjectItemsFromItemTemplateUniqueIds(payload.AssignedUniqueItemIdList);
+        existingProject.ProjectItems = projectItems;
+
+
+
+        await _db.SaveChangesAsync();
+
+        return Result<bool>.Ok(true, "Successfully assigned items");
+    }
     public async Task<Result<string>> RenameProject(string projectUniqueId, string newProjectName)
     {
         Project project = await _db.Projects.SingleOrDefaultAsync(p => p.UniqueId == projectUniqueId)
@@ -117,5 +102,4 @@ public class ProjectService(
 
         return Result<bool>.Ok(true, "Successfully archived project");
     }
-    public async Task<Result<>>
 }
