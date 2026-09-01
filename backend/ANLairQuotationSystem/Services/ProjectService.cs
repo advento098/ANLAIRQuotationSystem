@@ -102,4 +102,28 @@ public class ProjectService(
 
         return Result<bool>.Ok(true, "Successfully archived project");
     }
+
+    public async Task<Result<decimal>> CalculateFinalProjectQuotationCost(string userPublicId, string projectUniqueId)
+    {
+        Project? project = await _db.Projects
+            .Include(p => p.Quotation)
+                .ThenInclude(q => q.QuotationAdditionals)
+            .Include(p => p.Quotation)
+                .ThenInclude(q => q.QuotationComputationConstants)
+                .ThenInclude(qc => qc.ComputationConstant)
+            .Include(p => p.ProjectItems)
+                .ThenInclude(pi => pi.ProjectItemExpenses)
+            .Include(p => p.Creator)
+            .SingleOrDefaultAsync(p => p.UniqueId == projectUniqueId);
+        if (project is null) return Result<decimal>.Fail("Project does not exists");
+        if (project.Creator.PublicId != userPublicId) return Result<decimal>.Fail("Invalid request: UNAUTHORIZED_CREATOR");
+
+        project.Quotation.CalculateFinalCost();
+
+        decimal finalCalculation = project.Quotation.FinalCost;
+
+        await _db.SaveChangesAsync();
+
+        return Result<decimal>.Ok(finalCalculation, "Successfully calculated and saved project final cost");
+    }
 }
