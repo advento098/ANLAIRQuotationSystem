@@ -14,10 +14,11 @@ public class ComputationConstant
 
     public enum ConstantOperator
     {
-        Add = 1,          // Flat fees, extra material costs
-        Subtract = 2,     // Flat discounts, loyalty rebates
-        Multiply = 3,     // Tax rates (e.g., 1.12), markup percentages (e.g., 1.10)
-        PercentageAdd = 4 // Tax percentages stored as fractions (e.g., 0.12 means +12%)
+        Add = 1,
+        Subtract = 2,
+        Multiply = 3,
+        Divide = 4,
+        PercentageAdd = 5
     }
 
     public decimal CalculateNewValueUsingOperator(decimal currentValue)
