@@ -16,11 +16,34 @@ public class Quotation
     public void CalculateFinalCost()
     {
         decimal itemExpenseTotal = Project.ProjectItems.Sum(pt => pt.CalculateExpenses());
-        decimal quotationAdditionalsTotal = QuotationAdditionals.Sum(qa => qa.Cost);
-        // TODO: Continue working on final quotation cost
-        // Compute constants here before assigning to final cost
+
+        #region "Quotation Computations"
+
+        var orderedQuotationAdditionals = QuotationAdditionals.OrderBy(qa => qa.Operator);
+        decimal runningQuotationAdditionals = 0;
+
+        foreach (var item in orderedQuotationAdditionals)
+        {
+            runningQuotationAdditionals += item.CalculateNewValueUsingOperator(runningQuotationAdditionals);
+        }
+
+        decimal quotationAdditionalsTotal = runningQuotationAdditionals;
+
+        #endregion
+
+        #region "Constant Computations"
+
+        var orderedConstantComputations = QuotationComputationConstants.OrderBy(qc => qc.ComputationConstant.Operator);
+        decimal runningConstantComputationTotal = itemExpenseTotal + quotationAdditionalsTotal;
+
+        foreach (var qc in orderedConstantComputations)
+        {
+            runningConstantComputationTotal += qc.ComputationConstant.CalculateNewValueUsingOperator(runningConstantComputationTotal);
+        }
+
+        #endregion
 
         ItemsFinalCost = itemExpenseTotal;
-        //FinalCost = Math.Max(0, quotationAdditionalsTotal + itemExpenseTotal);
+        FinalCost = runningConstantComputationTotal;
     }
 }
