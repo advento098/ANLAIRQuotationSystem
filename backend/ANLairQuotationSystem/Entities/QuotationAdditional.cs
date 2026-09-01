@@ -21,4 +21,18 @@ public class QuotationAdditional
         Divide = 4,
         PercentageAdd = 5
     }
+
+    public decimal CalculateNewValueUsingOperator(decimal currentValue)
+    {
+        decimal resultingValue = Operator switch
+        {
+            QuotationOperator.Add => currentValue + Cost,
+            QuotationOperator.Subtract => currentValue - Cost,
+            QuotationOperator.Multiply => currentValue * Cost,
+            QuotationOperator.PercentageAdd => currentValue + (currentValue * Cost),
+            _ => throw new ArgumentException("Invalid operator: OPERATOR_NOT_FOUND"),
+        };
+
+        return resultingValue;
+    }
 }
