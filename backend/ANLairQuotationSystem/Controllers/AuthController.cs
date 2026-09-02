@@ -100,7 +100,6 @@ public class AuthController(
                 return Unauthorized(new ErrorResponse("Invalid request"));
             }
 
-            // TODO: Pass this to a new service for refreshing tokens
             var result = await _authService.RefreshToken(refreshTokenCookie);
             if (!result.IsSuccess) return Unauthorized(new ErrorResponse(result.Message));
 

@@ -110,7 +110,6 @@ public class ProjectService(
                 .ThenInclude(q => q.QuotationAdditionals)
             .Include(p => p.Quotation)
                 .ThenInclude(q => q.QuotationComputationConstants)
-                .ThenInclude(qc => qc.ComputationConstant)
             .Include(p => p.ProjectItems)
                 .ThenInclude(pi => pi.ProjectItemExpenses)
             .Include(p => p.Creator)
