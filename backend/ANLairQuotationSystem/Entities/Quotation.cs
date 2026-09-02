@@ -33,12 +33,12 @@ public class Quotation
 
         #region "Constant Computations"
 
-        var orderedConstantComputations = QuotationComputationConstants.OrderBy(qc => qc.ComputationConstant.Operator);
+        var orderedConstantComputations = QuotationComputationConstants.OrderBy(qc => qc.Operator);
         decimal runningConstantComputationTotal = itemExpenseTotal + quotationAdditionalsTotal;
 
         foreach (var qc in orderedConstantComputations)
         {
-            runningConstantComputationTotal += qc.ComputationConstant.CalculateNewValueUsingOperator(runningConstantComputationTotal);
+            runningConstantComputationTotal += qc.CalculateNewValueUsingOperator(runningConstantComputationTotal);
         }
 
         #endregion

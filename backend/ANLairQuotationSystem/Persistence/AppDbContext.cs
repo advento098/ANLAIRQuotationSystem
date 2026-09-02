@@ -307,18 +307,36 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
 
         builder.Entity<QuotationComputationConstant>(entity =>
         {
-            entity.HasKey(qc => new { qc.QuotationId, qc.ComputationConstantId });
+            entity.HasKey(qc => qc.Id);
+            entity.Property(qc => qc.Id)
+            .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.Name)
+               .HasMaxLength(150)
+               .IsRequired();
+
+            entity.HasIndex(e => e.Name)
+                .IsUnique();
+
+            entity.Property(e => e.Value)
+                .HasPrecision(13, 2)
+                .IsRequired();
+
+            entity.Property(e => e.Description)
+                .HasMaxLength(200);
+
+            entity.Property(e => e.DateCreated)
+                .IsRequired()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+            entity.Property(e => e.DateModified)
+                .IsRequired()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
             entity
             .HasOne(qc => qc.Quotation)
             .WithMany(q => q.QuotationComputationConstants)
             .HasForeignKey(qc => qc.QuotationId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-            entity
-            .HasOne(qc => qc.ComputationConstant)
-            .WithMany(cc => cc.QuotationComputationConstants)
-            .HasForeignKey(cc => cc.ComputationConstantId)
             .OnDelete(DeleteBehavior.Cascade);
         });
 

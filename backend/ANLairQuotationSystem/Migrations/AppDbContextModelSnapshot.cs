@@ -882,19 +882,58 @@ namespace ANLairQuotationSystem.Migrations
 
             modelBuilder.Entity("ANLairQuotationSystem.Entities.QuotationComputationConstant", b =>
                 {
+                    b.Property<uint>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<uint>("Id"));
+
+                    b.Property<DateTime>("DateCreated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("date_created")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+                    b.Property<DateTime>("DateModified")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("date_modified")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)")
+                        .HasColumnName("name");
+
+                    b.Property<int>("Operator")
+                        .HasColumnType("int")
+                        .HasColumnName("operator");
+
                     b.Property<uint>("QuotationId")
                         .HasColumnType("int unsigned")
                         .HasColumnName("quotation_id");
 
-                    b.Property<uint>("ComputationConstantId")
-                        .HasColumnType("int unsigned")
-                        .HasColumnName("computation_constant_id");
+                    b.Property<decimal>("Value")
+                        .HasPrecision(13, 2)
+                        .HasColumnType("decimal(13,2)")
+                        .HasColumnName("value");
 
-                    b.HasKey("QuotationId", "ComputationConstantId")
+                    b.HasKey("Id")
                         .HasName("pk_quotation_computation_constants");
 
-                    b.HasIndex("ComputationConstantId")
-                        .HasDatabaseName("ix_quotation_computation_constants_computation_constant_id");
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_quotation_computation_constants_name");
+
+                    b.HasIndex("QuotationId")
+                        .HasDatabaseName("ix_quotation_computation_constants_quotation_id");
 
                     b.ToTable("quotation_computation_constants", (string)null);
                 });
@@ -1340,21 +1379,12 @@ namespace ANLairQuotationSystem.Migrations
 
             modelBuilder.Entity("ANLairQuotationSystem.Entities.QuotationComputationConstant", b =>
                 {
-                    b.HasOne("ANLairQuotationSystem.Entities.ComputationConstant", "ComputationConstant")
-                        .WithMany("QuotationComputationConstants")
-                        .HasForeignKey("ComputationConstantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_quotation_computation_constants_computation_constants_comput");
-
                     b.HasOne("ANLairQuotationSystem.Entities.Quotation", "Quotation")
                         .WithMany("QuotationComputationConstants")
                         .HasForeignKey("QuotationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_quotation_computation_constants_quotations_quotation_id");
-
-                    b.Navigation("ComputationConstant");
 
                     b.Navigation("Quotation");
                 });
@@ -1407,11 +1437,6 @@ namespace ANLairQuotationSystem.Migrations
             modelBuilder.Entity("ANLairQuotationSystem.Entities.Client", b =>
                 {
                     b.Navigation("ClientProjects");
-                });
-
-            modelBuilder.Entity("ANLairQuotationSystem.Entities.ComputationConstant", b =>
-                {
-                    b.Navigation("QuotationComputationConstants");
                 });
 
             modelBuilder.Entity("ANLairQuotationSystem.Entities.Item", b =>
