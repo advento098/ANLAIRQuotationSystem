@@ -664,13 +664,6 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
         {
             entity.HasKey(i => i.Id);
 
-            entity.Property(i => i.UniqueId)
-                .IsRequired()
-                .HasMaxLength(50);
-
-            entity.HasIndex(i => i.UniqueId)
-                .IsUnique();
-
             entity.Property(i => i.Name)
                 .IsRequired()
                 .HasMaxLength(150);
