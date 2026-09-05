@@ -22,7 +22,7 @@ public class ProjectService(
     public async Task<Result<string>> CreateNewProject(NewProjectPayload payload)
     {
         DateTime finalDateRequested = payload.DateRequested ?? DateTime.Now;
-        string projectId = TextManager.GenerateProjectId(payload.Name, finalDateRequested);
+        string projectId = StringIdGenerator.GenerateUniqueId(payload.Name, finalDateRequested);
 
         // Fetch user
         uint userId = await _db.Users
@@ -69,7 +69,7 @@ public class ProjectService(
             ?? throw new Exception("Project does not exist");
 
         project.Name = newProjectName;
-        project.UniqueId = TextManager.GenerateProjectId(newProjectName);
+        project.UniqueId = StringIdGenerator.GenerateUniqueId(newProjectName);
 
         await _db.SaveChangesAsync();
 
