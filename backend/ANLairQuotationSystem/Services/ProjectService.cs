@@ -1,5 +1,6 @@
 ﻿using ANLairQuotationSystem.Common;
 using ANLairQuotationSystem.DTO.Payloads;
+using ANLairQuotationSystem.DTO.Payloads.ProjectItem;
 using ANLairQuotationSystem.DTO.Payloads.Quotation;
 using ANLairQuotationSystem.Entities;
 using ANLairQuotationSystem.Persistence;
@@ -97,26 +98,80 @@ public class ProjectService(
         // Load project
         Project? existingProject = await _db.Projects.SingleOrDefaultAsync(p => p.UniqueId == payload.ProjectUniqueId);
         if (existingProject == null) return Result<bool>.Fail("Project does not exists");
-        if (existingProject.Status == Project.ProjectStatus.QUOTED || existingProject.Status == Project.ProjectStatus.ARCHIVED)
+        if (existingProject.Status == Project.ProjectStatus.QUOTED)
             return Result<bool>.Fail("Cannot edit quoted and archived projects");
 
         // Load chosen items
-        List<ProjectItem> projectItems = await _projectRepository.CreateProjectItemsFromItemTemplateUniqueIds(payload.AssignedUniqueItemIdList);
+        List<ProjectItem> projectItems =
+            await _projectRepository.CreateProjectItemsFromItemTemplateUniqueIds(payload.AssignedUniqueItemIdList);
         existingProject.ProjectItems = [.. existingProject.ProjectItems, .. projectItems];
         // Compute every items
-        foreach (var item in projectItems)
+        foreach (var item in existingProject.ProjectItems)
         {
             item.CalculateExpenses();
         }
+
+        existingProject.DateModified = DateTime.Now;
 
         await _db.SaveChangesAsync();
 
         return Result<bool>.Ok(true, "Successfully assigned items");
     }
-    //public async Task<Result<bool>> ManualAssignProjectItems(ManualAssignProjectItemPayload payload)
-    //{
+    public async Task<Result<bool>> ManualAssignProjectItems(ManualAssignProjectItemPayload payload)
+    {
+        Project? existingProject = await _db.Projects.SingleOrDefaultAsync(p => p.UniqueId == payload.ProjectUniqueId);
+        if (existingProject == null) return Result<bool>.Fail("Project does not exists");
+        if (existingProject.Status == Project.ProjectStatus.QUOTED)
+            return Result<bool>.Fail("Cannot edit quoted and archived projects");
 
-    //}
+        List<ProjectItem> projectItems = [..payload.ProjectItems.Select(item => new ProjectItem()
+        {
+            TypeId = item.TypeId,
+            UniqueId = StringIdGenerator.GenerateUniqueId(item.Name),
+            Name = item.Name,
+            DistributorName = item.DistributorName,
+            ContactNumber = item.ContactNumber,
+            Email = item.Email,
+            DateCreated = DateTime.Now,
+            DateModified = DateTime.Now,
+            ProjectItemExpenses = [..item.ProjectItemExpenses.Select(expense => new ProjectItemExpense()
+            {
+                Name = expense.Name,
+                Description = expense.Description,
+                Cost = expense.Cost,
+                DateCreated = DateTime.Now,
+                DateModified = DateTime.Now
+            })],
+            ProjectItemSpecifications = [..item.ProjectItemSpecifications.Select(spec => new ProjectItemSpecification()
+            {
+                Name = spec.Name,
+                Description = spec.Description,
+                Value = spec.Value,
+                DateCreated = DateTime.Now,
+                DateModified = DateTime.Now,
+            })],
+            ProjectItemImages = [..item.ProjectItemImages.Select(img => new ProjectItemImage()
+            {
+                Image = img.Image,
+                ContentType = img.ContentType,
+                Caption = img.Caption,
+                DateCreated = DateTime.Now,
+                DateModified = DateTime.Now
+            })],
+        })];
+        existingProject.ProjectItems = [.. existingProject.ProjectItems, .. projectItems];
+
+        foreach (var item in existingProject.ProjectItems)
+        {
+            item.CalculateExpenses();
+        }
+
+        existingProject.DateModified = DateTime.Now;
+
+        await _db.SaveChangesAsync();
+
+        return Result<bool>.Ok(true, "Successfully assigned manual project items");
+    }
 
     #endregion
 
