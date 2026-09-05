@@ -2,16 +2,16 @@
 using ANLairQuotationSystem.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace ANLairQuotationSystem.Factories;
+namespace ANLairQuotationSystem.Repositories;
 
-public class ProjectItemFactory(
+public class ProjectRepository(
         AppDbContext db
     )
 {
     private readonly AppDbContext _db = db;
     public async Task<List<ProjectItem>> CreateProjectItemsFromItemTemplateUniqueIds(List<string> itemUniqueIdList)
     {
-        return await _db.Items
+        var result = await _db.Items
             .AsNoTracking()
             .Where(i => itemUniqueIdList.Contains(i.UniqueId))
             .Select(item => new ProjectItem()
@@ -22,7 +22,6 @@ public class ProjectItemFactory(
                 DistributorName = item.DistributorName,
                 ContactNumber = item.ContactNumber,
                 Email = item.Email,
-                FinalCost = item.FinalCost,
                 DateCreated = DateTime.Now,
                 DateModified = DateTime.Now,
                 Type = item.Type,
@@ -45,10 +44,19 @@ public class ProjectItemFactory(
                 ProjectItemImages = item.ItemImages.Select(img => new ProjectItemImage()
                 {
                     Image = img.Image,
+                    ContentType = img.ContentType,
+                    Caption = img.Caption,
                     DateCreated = DateTime.Now,
                     DateModified = DateTime.Now
                 }).ToList()
             })
             .ToListAsync();
+
+        foreach (var item in result)
+        {
+            item.CalculateExpenses();
+        }
+
+        return result;
     }
 }

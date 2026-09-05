@@ -3,6 +3,7 @@ using ANLairQuotationSystem.DTO.Payloads;
 using ANLairQuotationSystem.Entities;
 using ANLairQuotationSystem.Factories;
 using ANLairQuotationSystem.Persistence;
+using ANLairQuotationSystem.Repositories;
 using ANLairQuotationSystem.Utilities;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,11 +11,11 @@ namespace ANLairQuotationSystem.Services;
 
 public class ProjectService(
         AppDbContext db,
-        ProjectItemFactory projectItemFactory
+        ProjectRepository projectRepository
     )
 {
     private readonly AppDbContext _db = db;
-    private readonly ProjectItemFactory _projectItemFactory = projectItemFactory;
+    private readonly ProjectRepository _projectRepository = projectRepository;
 
     public async Task<Result<string>> CreateNewProject(NewProjectPayload payload)
     {
@@ -33,7 +34,7 @@ public class ProjectService(
             .FirstAsync();
 
         List<ProjectItem> items = payload.ItemTemplateUniqueId != null ?
-            await _projectItemFactory.CreateProjectItemsFromItemTemplateUniqueIds(payload.ItemTemplateUniqueId) :
+            await _projectRepository.CreateProjectItemsFromItemTemplateUniqueIds(payload.ItemTemplateUniqueId) :
             [];
 
         Project newProject = new()
@@ -102,6 +103,7 @@ public class ProjectService(
 
         return Result<bool>.Ok(true, "Successfully archived project");
     }
+        List<ProjectItem> projectItems = await _projectRepository.CreateProjectItemsFromItemTemplateUniqueIds(payload.AssignedUniqueItemIdList);
 
     public async Task<Result<decimal>> CalculateFinalProjectQuotationCost(string userPublicId, string projectUniqueId)
     {
