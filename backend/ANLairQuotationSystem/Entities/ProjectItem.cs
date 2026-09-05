@@ -10,7 +10,7 @@ public class ProjectItem
     public required string DistributorName { get; set; }
     public string? ContactNumber { get; set; }
     public string? Email { get; set; }
-    public decimal FinalCost { get; set; }
+    public decimal FinalCost { get; private set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateModified { get; set; }
 
@@ -21,8 +21,9 @@ public class ProjectItem
     public ICollection<ProjectItemSpecification> ProjectItemSpecifications { get; set; } = [];
     public ICollection<ProjectItemImage> ProjectItemImages { get; set; } = [];
 
-    public decimal CalculateExpenses()
+    public void CalculateExpenses()
     {
-        return ProjectItemExpenses.Sum(pie => pie.Cost);
+        decimal total = ProjectItemExpenses.Sum(pie => pie.Cost);
+        FinalCost = total;
     }
 }

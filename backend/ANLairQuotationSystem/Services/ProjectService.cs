@@ -104,6 +104,12 @@ public class ProjectService(
         return Result<bool>.Ok(true, "Successfully archived project");
     }
         List<ProjectItem> projectItems = await _projectRepository.CreateProjectItemsFromItemTemplateUniqueIds(payload.AssignedUniqueItemIdList);
+        existingProject.ProjectItems = [.. existingProject.ProjectItems, .. projectItems];
+        // Compute every items
+        foreach (var item in projectItems)
+        {
+            item.CalculateExpenses();
+        }
 
     public async Task<Result<decimal>> CalculateFinalProjectQuotationCost(string userPublicId, string projectUniqueId)
     {

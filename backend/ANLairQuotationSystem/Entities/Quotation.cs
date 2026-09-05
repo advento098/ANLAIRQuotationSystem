@@ -15,7 +15,9 @@ public class Quotation
     /// </summary>
     public void CalculateFinalCost()
     {
-        decimal itemExpenseTotal = Project.ProjectItems.Sum(pt => pt.CalculateExpenses());
+        if (Project.Status == Project.ProjectStatus.QUOTED) throw new Exception("Project is already quoted, cannot calculate final cost");
+
+        decimal itemExpenseTotal = Project.ProjectItems.Sum(pt => pt.FinalCost);
 
         #region "Quotation Computations"
 
