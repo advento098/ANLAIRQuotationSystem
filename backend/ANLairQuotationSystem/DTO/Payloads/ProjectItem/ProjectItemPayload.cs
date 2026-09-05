@@ -3,6 +3,7 @@
 public class ProjectItemPayload
 {
     public uint TypeId { get; set; }
+    public bool ShouldAddToTemplates { get; set; } = false;
     public required string Name { get; set; }
     public required string DistributorName { get; set; }
     public string? ContactNumber { get; set; }

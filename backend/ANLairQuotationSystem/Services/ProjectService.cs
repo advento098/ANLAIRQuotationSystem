@@ -168,6 +168,103 @@ public class ProjectService(
 
         existingProject.DateModified = DateTime.Now;
 
+        // Check for should save project items to template
+        var itemsToProcess = payload.ProjectItems
+            .Where(p => p.ShouldAddToTemplates)
+            .Select(p => new
+            {
+                UniqueId = StringIdGenerator.GenerateUniqueId(p.Name),
+                PayloadItem = p
+            });
+
+        List<string> uniqueIdListToProcess = [.. itemsToProcess.Select(p => p.UniqueId)];
+        Dictionary<string, Item> duplicateItems = await _db.Items
+            .Where(pi => uniqueIdListToProcess.Contains(pi.UniqueId))
+            .ToDictionaryAsync(pi => pi.UniqueId);
+
+        List<Item> newItems = [];
+        foreach (var item in itemsToProcess)
+        {
+            duplicateItems.TryGetValue(item.UniqueId, out var existingItem);
+
+            if (existingItem == null)
+            {
+                newItems.Add(new Item()
+                {
+                    TypeId = item.PayloadItem.TypeId,
+                    UniqueId = item.UniqueId,
+                    Name = item.PayloadItem.Name,
+                    DistributorName = item.PayloadItem.DistributorName,
+                    ContactNumber = item.PayloadItem.ContactNumber,
+                    Email = item.PayloadItem.Email,
+                    DateCreated = DateTime.Now,
+                    DateModified = DateTime.Now,
+
+                    ItemExpenses = [..item.PayloadItem.ProjectItemExpenses.Select(p => new ItemExpense()
+                    {
+                        Name = p.Name,
+                        Description = p.Description,
+                        Cost = p.Cost,
+                        DateCreated = DateTime.Now,
+                        DateModified = DateTime.Now
+                    })],
+                    ItemSpecifications = [..item.PayloadItem.ProjectItemSpecifications.Select(p => new ItemSpecification() {
+                        Name = p.Name,
+                        Description = p.Description,
+                        Value = p.Value,
+                        DateCreated = DateTime.Now,
+                        DateModified = DateTime.Now
+                    })],
+                    ItemImages = [..item.PayloadItem.ProjectItemImages.Select(p => new ItemImage() {
+                        Image = p.Image,
+                        ContentType = p.ContentType,
+                        Caption = p.Caption,
+                        DateCreated = DateTime.Now,
+                        DateModified = DateTime.Now
+                    })]
+                });
+            }
+            else
+            {
+                existingItem.TypeId = item.PayloadItem.TypeId;
+                existingItem.UniqueId = item.UniqueId;
+                existingItem.Name = item.PayloadItem.Name;
+                existingItem.DistributorName = item.PayloadItem.DistributorName;
+                existingItem.ContactNumber = item.PayloadItem.ContactNumber;
+                existingItem.Email = item.PayloadItem.Email;
+                existingItem.DateModified = DateTime.Now;
+
+                // Continue working with existing item expenses instead of item.PayloadItem.ProjectItemExpenses
+                existingItem.ItemExpenses = [..item.PayloadItem.ProjectItemExpenses.Select(p => new ItemExpense()
+                    {
+                        Name = p.Name,
+                        Description = p.Description,
+                        Cost = p.Cost,
+                        DateCreated = DateTime.Now,
+                        DateModified = DateTime.Now
+                    })];
+                // Continue working with existing item specifications instead of item.PayloadItem.ProjectItemSpecifications
+                existingItem.ItemSpecifications = [..item.PayloadItem.ProjectItemSpecifications.Select(p => new ItemSpecification() {
+                        Name = p.Name,
+                        Description = p.Description,
+                        Value = p.Value,
+                        DateCreated = DateTime.Now,
+                        DateModified = DateTime.Now
+                    })];
+                // Continue working with existing item images instead of item.PayloadItem.ProjectItemImages
+                existingItem.ItemImages = [..item.PayloadItem.ProjectItemImages.Select(p => new ItemImage() {
+                        Image = p.Image,
+                        ContentType = p.ContentType,
+                        Caption = p.Caption,
+                        DateCreated = DateTime.Now,
+                        DateModified = DateTime.Now
+                    })];
+
+                existingItem.CalculateExpenses();
+            }
+        }
+
+        await _db.Items.AddRangeAsync(newItems);
         await _db.SaveChangesAsync();
 
         return Result<bool>.Ok(true, "Successfully assigned manual project items");
