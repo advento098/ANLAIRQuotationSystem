@@ -646,6 +646,16 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
                 .IsRequired()
                 .HasColumnType("MEDIUMBLOB");
 
+            entity
+            .Property(i => i.ContentType)
+            .IsRequired()
+            .HasMaxLength(100);
+
+            entity
+            .Property(i => i.Caption)
+            .IsRequired(false)
+            .HasMaxLength(150);
+
             entity.Property(i => i.DateCreated)
                .IsRequired()
                .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
@@ -766,6 +776,16 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             entity.Property(i => i.Image)
                 .IsRequired()
                 .HasColumnType("MEDIUMBLOB");
+
+            entity
+            .Property(i => i.ContentType)
+            .IsRequired()
+            .HasMaxLength(100);
+
+            entity
+            .Property(i => i.Caption)
+            .IsRequired(false)
+            .HasMaxLength(150);
 
             entity.Property(i => i.DateCreated)
                .IsRequired()
